@@ -33,6 +33,9 @@ int main()
 
   Tracking fusion;
   Tools::RMSE RMSE;
+  // By default, all sensors are enabled.
+  // Uncomment this line to enable only LIDAR measurements.
+  // fusion.sensors_ = MeasurementPackage::LASER;
 
   h.onMessage([&fusion, &RMSE](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -72,35 +75,28 @@ int main()
       float px, py;
       iss >> px >> py;
       measurement.raw_measurements_ << px, py;
-      iss >> measurement.timestamp_;
     } else if (sensor_type.compare("R") == 0) {
       measurement.sensor_type_ = MeasurementPackage::RADAR;
       measurement.raw_measurements_ = VectorXd(3);
       float ro, theta, ro_dot;
       iss >> ro >> theta >> ro_dot;
       measurement.raw_measurements_ << ro, theta, ro_dot;
-      iss >> measurement.timestamp_;
     }
+    iss >> measurement.timestamp_;
     float x_gt, y_gt, vx_gt, vy_gt;
     iss >> x_gt >> y_gt >> vx_gt >> vy_gt;
 
     VectorXd ground_truth(4);
-    ground_truth(0) = x_gt;
-    ground_truth(1) = y_gt;
-    ground_truth(2) = vx_gt;
-    ground_truth(3) = vy_gt;
+    ground_truth << x_gt, y_gt, vx_gt, vy_gt;
 
     fusion.Process(measurement);
-    //Push the current estimated x,y positon from the Kalman filter's state vector
+    VectorXd estimate = fusion.GetEstimate();
+    VectorXd rmse = RMSE.Update(estimate, ground_truth);
 
-    double px = fusion.kf_.x_(0);
-    double py = fusion.kf_.x_(1);
-
-    VectorXd rmse = RMSE.Update(fusion.kf_.x_, ground_truth);
-
+    // Push the current estimated (x, y) position
     json msgJson;
-    msgJson["estimate_x"] = px;
-    msgJson["estimate_y"] = py;
+    msgJson["estimate_x"] = estimate(0);
+    msgJson["estimate_y"] = estimate(1);
     msgJson["rmse_x"] =  rmse(0);
     msgJson["rmse_y"] =  rmse(1);
     msgJson["rmse_vx"] = rmse(2);

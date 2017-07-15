@@ -81,9 +81,9 @@ void RadarModel::Update(KalmanFilter& kf, const VectorXd& z) const {
 
 // Process a single measurement
 void Tracking::Process(const MeasurementPackage& measurement) {
-  // if (measurement.sensor_type_ != MeasurementPackage::RADAR) {
-  //   return;
-  // }
+  if (0 == (sensors_ & measurement.sensor_type_)) {
+    return;
+  }
 
   // Compute the time elapsed between the current and previous measurements, expressed in seconds
   float dt = (measurement.timestamp_ - previous_timestamp_) / 1000000.0;
@@ -118,4 +118,8 @@ void Tracking::Process(const MeasurementPackage& measurement) {
 
   // cout << "x_ = " << kf_.x_ << endl;
   // cout << "P_ = " << kf_.P_ << endl;
+}
+
+VectorXd Tracking::GetEstimate() const {
+  return kf_.x_;
 }

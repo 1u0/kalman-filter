@@ -38,14 +38,19 @@ public:
   Tracking() {}
 
   void Process(const MeasurementPackage& measurement);
-  KalmanFilter kf_;
 
+  // Returns 4D vector of (x, y, vx, vy).
+  Eigen::VectorXd GetEstimate() const;
+
+  // Bitmask of enabled sensors
+  long sensors_ = MeasurementPackage::LASER | MeasurementPackage::RADAR;
 private:
-  bool is_initialized_ = !false;
-  long previous_timestamp_ = 0;
+  bool is_initialized_ = false;
+  long long previous_timestamp_ = 0;
 
   LidarModel lidar_;
   RadarModel radar_;
+  KalmanFilter kf_;
 };
 
 #endif /* TRACKING_H_ */
