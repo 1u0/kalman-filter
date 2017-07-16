@@ -79,9 +79,9 @@ int main()
     } else if (sensor_type.compare("R") == 0) {
       measurement.sensor_type_ = MeasurementPackage::RADAR;
       measurement.raw_measurements_ = VectorXd(3);
-      float ro, theta, ro_dot;
-      iss >> ro >> theta >> ro_dot;
-      measurement.raw_measurements_ << ro, theta, ro_dot;
+      float ro, phi, ro_dot;
+      iss >> ro >> phi >> ro_dot;
+      measurement.raw_measurements_ << ro, phi, ro_dot;
     }
     iss >> measurement.timestamp_;
     float x_gt, y_gt, vx_gt, vy_gt;

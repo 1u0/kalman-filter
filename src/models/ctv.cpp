@@ -12,10 +12,11 @@ namespace KF {
 
 void Init(KalmanFilter& kf, const VectorXd& x) {
   kf.x_ = x;
-  kf.P_ << 1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1000, 0,
-        0, 0, 0, 1000;
+  kf.P_ <<
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1000, 0,
+    0, 0, 0, 1000;
 }
 
 void Update(KalmanFilter& kf, const VectorXd& y, const MatrixXd& H, const MatrixXd& R) {
@@ -40,12 +41,12 @@ void ExtendedUpdate(KalmanFilter& kf, const VectorXd& z, const MatrixXd& R) {
   float ro2 = px*px + py*py;
   float ro = sqrt(ro2);
   float ro3 = ro2 * ro;
-  float theta = atan2(py, px);
+  float phi = atan2(py, px);
   float ro_dot = ro > 0.0001 ? (px*vx + py*vy)/ro : 0.0;
 
   // Predicted measurement
   VectorXd z0 = VectorXd(3);
-  z0 << ro, theta, ro_dot;
+  z0 << ro, phi, ro_dot;
 
   // Jakobian measurement matrix
   MatrixXd Hj(3, 4);
@@ -65,19 +66,23 @@ void ExtendedUpdate(KalmanFilter& kf, const VectorXd& z, const MatrixXd& R) {
 
 
 Model::Model() {
-  F_ << 1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1;  
+  F_ <<
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1;  
 
-  lidar_R_ << 0.0225, 0,
-        0, 0.0225;
-  lidar_H_ << 1, 0, 0, 0,
-        0, 1, 0, 0;
+  lidar_R_ <<
+    0.0225, 0, // std_px = 0.15 m
+    0, 0.0225; // std_py = 0.15 m
+  lidar_H_ <<
+    1, 0, 0, 0,
+    0, 1, 0, 0;
 
-  radar_R_ << 0.09, 0, 0,
-        0, 0.0009, 0,
-        0, 0, 0.09;
+  radar_R_ <<
+    0.09, 0, 0,   // std_ro = 0.3 m
+    0, 0.0009, 0, // std_phi = 0.03 rad
+    0, 0, 0.09;   // std_ro_dot = 0.3 m/s
 }
 
 void Model::Init(MeasurementPackage::SensorType type, const VectorXd& z) {
@@ -92,11 +97,11 @@ void Model::Init(MeasurementPackage::SensorType type, const VectorXd& z) {
     }
     case MeasurementPackage::RADAR: {
       double ro = z(0);
-      double theta = z(1);
+      double phi = z(1);
       double ro_dot = z(2);
-      double cos_theta = cos(theta), sin_theta = sin(theta);
+      double cos_phi = cos(phi), sin_phi = sin(phi);
       VectorXd x0 = VectorXd(4);
-      x0 << ro * cos_theta, ro * sin_theta, 0, 0;//ro_dot * cos_theta, ro_dot * sin_theta;
+      x0 << ro * cos_phi, ro * sin_phi, 0, 0;//ro_dot * cos_phi, ro_dot * sin_phi;
       KF::Init(kf_, x0);
       break;
     }
