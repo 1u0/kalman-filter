@@ -7,7 +7,7 @@ add_definitions(-std=c++11)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 
-set(sources src/main.cpp src/tracking.cpp src/tools.cpp src/kalman_filter.cpp)
+set(sources src/main.cpp src/tools.cpp src/models/ctv.cpp)
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 

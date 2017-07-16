@@ -4,6 +4,7 @@
 
 #include "tracking.h"
 #include "tools.h"
+#include "models/ctv.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ int main()
 {
   uWS::Hub h;
 
-  Tracking fusion;
+  Tracking<CTV::Model> fusion;
   Tools::RMSE RMSE;
   // By default, all sensors are enabled.
   // Uncomment this line to enable only LIDAR measurements.
