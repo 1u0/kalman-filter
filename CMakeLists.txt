@@ -1,4 +1,4 @@
-project(ExtendedKF)
+project(UnscentedKF)
 
 cmake_minimum_required (VERSION 3.5)
 
@@ -7,7 +7,7 @@ add_definitions(-std=c++11)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 
-set(sources src/main.cpp src/tools.cpp src/models/ctv.cpp)
+set(sources src/main.cpp src/tools.cpp src/models/ctv.cpp src/models/ctrv.cpp)
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
@@ -21,6 +21,6 @@ link_directories(/usr/local/Cellar/libuv/1.11.0/lib)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
 
 
-add_executable(ExtendedKF ${sources})
+add_executable(UnscentedKF ${sources})
 
-target_link_libraries(ExtendedKF z ssl uv uWS)
+target_link_libraries(UnscentedKF z ssl uv uWS)

@@ -19,10 +19,10 @@ public:
 
     // Compute the time elapsed between the current and previous measurements, expressed in seconds
     float dt = (measurement.timestamp_ - previous_timestamp_) / 1000000.0;
-    std::cout << "dt = " << dt << std::endl;
+    std::cout << "dt = " << dt << ", " << measurement.timestamp_ << std::endl;
     previous_timestamp_ = measurement.timestamp_;
-    if (!is_initialized_ || dt > 1e+7) {
-      std::cout << "Kalman Filter Initialization " << std::endl;
+    if (!is_initialized_ || dt > 1e+5) {
+      std::cout << "Initialization " << std::endl;
       model_.Init(measurement.sensor_type_, measurement.raw_measurements_);
       is_initialized_ = true;
       return;
